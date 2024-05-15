@@ -23,15 +23,15 @@ class WebQrView extends StatefulWidget {
   final PermissionSetCallback? onPermissionSet;
   final CameraFacing? cameraFacing;
 
-  const WebQrView(
-      {Key? key,
-      required this.onPlatformViewCreated,
-      this.onPermissionSet,
-      this.cameraFacing = CameraFacing.front})
-      : super(key: key);
+  const WebQrView({
+    super.key,
+    required this.onPlatformViewCreated,
+    this.onPermissionSet,
+    this.cameraFacing = CameraFacing.front,
+  });
 
   @override
-  _WebQrViewState createState() => _WebQrViewState();
+  State<WebQrView> createState() => _WebQrViewState();
 
   static html.DivElement vidDiv =
       html.DivElement(); // need a global for the registerViewFactory
@@ -53,6 +53,7 @@ class WebQrView extends StatefulWidget {
 
 class _WebQrViewState extends State<WebQrView> {
   html.MediaStream? _localStream;
+
   // html.CanvasElement canvas;
   // html.CanvasRenderingContext2D ctx;
   bool _currentlyProcessing = false;
@@ -64,7 +65,7 @@ class _WebQrViewState extends State<WebQrView> {
   String? code;
   String? _errorMsg;
   html.VideoElement video = html.VideoElement();
-  String viewID = 'QRVIEW-' + DateTime.now().millisecondsSinceEpoch.toString();
+  String viewID = 'QRVIEW-${DateTime.now().millisecondsSinceEpoch}';
 
   final StreamController<Barcode> _scanUpdateController =
       StreamController<Barcode>();
@@ -83,7 +84,7 @@ class _WebQrViewState extends State<WebQrView> {
     // ignore: UNDEFINED_PREFIXED_NAME
     ui.platformViewRegistry
         .registerViewFactory(viewID, (int id) => WebQrView.vidDiv);
-    // giving JavaScipt some time to process the DOM changes
+    // giving JavaScript some time to process the DOM changes
     Timer(const Duration(milliseconds: 500), () {
       start();
     });
@@ -137,8 +138,10 @@ class _WebQrViewState extends State<WebQrView> {
       widget.onPermissionSet?.call(_controller!, true);
       _localStream = stream;
       video.srcObject = _localStream;
-      video.setAttribute('playsinline',
-          'true'); // required to tell iOS safari we don't want fullscreen
+      video.setAttribute(
+        'playsinline',
+        'true',
+      ); // required to tell iOS safari we don't want fullscreen
       await video.play();
     } catch (e) {
       cancel();
@@ -201,7 +204,7 @@ class _WebQrViewState extends State<WebQrView> {
             .add(Barcode(code.data, BarcodeFormat.qrcode, code.data.codeUnits));
       }
     } on NoSuchMethodError {
-      // Do nothing, this exception occurs continously in web release when no
+      // Do nothing, this exception occurs continuously in web release when no
       // code is found.
       // NoSuchMethodError: method not found: 'get$data' on null
     }
@@ -257,6 +260,7 @@ class QRViewControllerWeb implements QRViewController {
   final _WebQrViewState _state;
 
   QRViewControllerWeb(this._state);
+
   @override
   void dispose() => _state.cancel();
 
