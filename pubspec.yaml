@@ -8,7 +8,7 @@ environment:
   sdk: '>=3.4.0 <4.0.0'
 
 dependencies:
-  js: '>=0.6.4 <0.7.1'
+  js: ^0.6.4
 
   flutter:
     sdk: flutter
